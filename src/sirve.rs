@@ -23,7 +23,7 @@ use std::convert::Infallible;
 use std::net::SocketAddr;
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
-use std::time::Duration;
+use std::time::{Duration, Instant};
 use tokio::sync::{Semaphore, watch};
 use tokio_stream::StreamExt;
 use tokio_stream::wrappers::WatchStream;
@@ -84,6 +84,8 @@ pub async fn sirve() -> Result<(), String> {
         let host = host.clone();
         tokio::spawn(async move {
             let mut tick = 0u64;
+            // la posición que se mandó la última vez que se avisó, y cuándo
+            let mut avisado: Option<(f64, Instant)> = None;
             let mut ips = crate::tls::local_ips();
             let mut looks = app.estado.borrow().looks.clone();
             let mut look = app.estado.borrow().look.clone();
@@ -102,12 +104,19 @@ pub async fn sirve() -> Result<(), String> {
                 }
                 e.tema = tema.json();
                 e.otras = otras.lock().unwrap().iter().map(|(k, v)| (k.clone(), v.clone())).collect();
+                // La posición de la canción la avanza el cel solo: si fue lo único que
+                // cambió y va donde se esperaba, se guarda (para quien se conecte
+                // después) pero no se le avisa a nadie. ~12 MB/hora → casi nada.
                 tx.send_if_modified(|old| {
-                    let cambio = *old != e;
-                    if cambio {
-                        *old = e;
+                    if *old == e {
+                        return false;
                     }
-                    cambio
+                    let avisar = !solo_avanzo(old, &e, avisado);
+                    if avisar {
+                        avisado = e.musica.as_ref().map(|m| (m.pos, Instant::now()));
+                    }
+                    *old = e;
+                    avisar
                 });
                 // ¿otra IP (otro Wi-Fi, DHCP)? certificado nuevo para ella
                 if tick.is_multiple_of(20) {
@@ -360,4 +369,48 @@ async fn olvidame(headers: HeaderMap) -> Response {
         confianza::olvidar_llave(&k);
     }
     ([(header::SET_COOKIE, "trompo=; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=Strict")], Json(json!({ "ok": true }))).into_response()
+}
+
+/// ¿Lo único distinto es la posición de una canción que sigue sonando, y va
+/// donde el cel ya la tiene (lo avisado + lo que ha pasado, ±2 s)?
+fn solo_avanzo(old: &Estado, new: &Estado, avisado: Option<(f64, Instant)>) -> bool {
+    let (Some(a), Some(b), Some((pos, cuando))) = (&old.musica, &new.musica, avisado) else { return false };
+    if b.estado != "Playing" || a.estado != "Playing" {
+        return false;
+    }
+    let mut sin_pos = old.clone();
+    if let Some(m) = sin_pos.musica.as_mut() {
+        m.pos = b.pos;
+    }
+    sin_pos == *new && (b.pos - (pos + cuando.elapsed().as_secs_f64())).abs() < 2.0
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::estado::Musica;
+
+    fn con(pos: f64, estado: &str) -> Estado {
+        Estado { musica: Some(Musica { estado: estado.into(), titulo: "t".into(), largo: 200.0, pos, ..Default::default() }), ..Default::default() }
+    }
+
+    #[test]
+    fn solo_avanza_la_cancion() {
+        let hace = Instant::now() - Duration::from_secs(5);
+        let avisado = Some((10.0, hace));
+        // sonando y va donde se esperaba: no se avisa
+        assert!(solo_avanzo(&con(14.0, "Playing"), &con(15.0, "Playing"), avisado));
+        // brincó (la adelantaron): se avisa
+        assert!(!solo_avanzo(&con(14.0, "Playing"), &con(60.0, "Playing"), avisado));
+        // pausa: se avisa
+        assert!(!solo_avanzo(&con(14.0, "Playing"), &con(15.0, "Paused"), avisado));
+        // otra canción: se avisa
+        let mut otra = con(15.0, "Playing");
+        otra.musica.as_mut().unwrap().titulo = "otra".into();
+        assert!(!solo_avanzo(&con(14.0, "Playing"), &otra, avisado));
+        // cambió el volumen: se avisa
+        let mut vol = con(15.0, "Playing");
+        vol.volumen = Some((40, false));
+        assert!(!solo_avanzo(&con(14.0, "Playing"), &vol, avisado));
+    }
 }
