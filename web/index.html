@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<meta name="theme-color" content="#16130f">
+<title>trompo</title>
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/icono.svg">
+<link rel="apple-touch-icon" href="/icono-192.png">
+<link rel="stylesheet" href="/app.css">
+</head>
+<body data-pantalla="cargando">
+
+<!-- cargando / sin conexión -->
+<section id="cargando" class="centro">
+  <div class="trompito" aria-hidden="true"><img src="/icono.svg" alt=""></div>
+  <p id="cargando-texto"></p>
+</section>
+
+<!-- emparejar -->
+<section id="emparejar" class="centro">
+  <img class="logo" src="/icono.svg" alt="">
+  <h1>trompo</h1>
+  <div id="emparejar-con-codigo">
+    <p data-t="emparejar_intro"></p>
+    <label class="campo">
+      <span data-t="nombre_cel"></span>
+      <input id="nombre" maxlength="40" autocomplete="off">
+    </label>
+    <button class="boton" id="emparejar-boton" data-t="emparejar"></button>
+    <p class="error" id="emparejar-error"></p>
+  </div>
+  <div id="emparejar-sin-codigo">
+    <p data-t="sin_codigo"></p>
+    <code>trompo</code>
+  </div>
+</section>
+
+<!-- la app -->
+<div id="app">
+  <header>
+    <div class="maquinas" id="maquinas"></div>
+  </header>
+
+  <main>
+    <section class="vista" id="vista-inicio">
+      <button class="ahora" id="ahora">
+        <img id="ahora-img" alt="">
+        <span class="ahora-txt"><small data-t="look_ahora"></small><b id="ahora-look"></b></span>
+      </button>
+      <article class="tarjeta musica" id="musica">
+        <div class="caratula" id="caratula"><img id="caratula-img" alt=""><span class="nota" data-ico="nota"></span></div>
+        <div class="musica-info">
+          <div class="titulo" id="titulo"></div>
+          <div class="artista" id="artista"></div>
+        </div>
+        <div class="barra progreso" id="progreso"><i></i></div>
+        <div class="tiempos"><span id="t-pos"></span><span id="t-largo"></span></div>
+        <div class="controles">
+          <button class="icono" data-musica="previous" aria-label="previous" data-ico="prev"></button>
+          <button class="icono grande" data-musica="play-pause" id="play" aria-label="play/pause" data-ico="play"></button>
+          <button class="icono" data-musica="next" aria-label="next" data-ico="next"></button>
+        </div>
+      </article>
+      <article class="tarjeta nada" id="nada-sonando"><span data-t="nada_sonando"></span></article>
+
+      <article class="tarjeta deslizador" id="tarjeta-volumen">
+        <button class="etiqueta" id="mudo"><span class="ico" data-ico="vol" id="mudo-ico"></span><span data-t="volumen"></span></button>
+        <input type="range" min="0" max="100" id="volumen">
+        <output id="volumen-n"></output>
+      </article>
+      <article class="tarjeta deslizador" id="tarjeta-brillo">
+        <span class="etiqueta"><span class="ico" data-ico="sol"></span><span data-t="brillo"></span></span>
+        <input type="range" min="1" max="100" id="brillo">
+        <output id="brillo-n"></output>
+      </article>
+
+      <div class="acciones">
+        <button class="accion" id="machin"><span class="ico" data-ico="monitor"></span><span class="txt">machín</span><small id="machin-estado"></small></button>
+        <button class="accion" id="bloquear" data-confirma><span class="ico" data-ico="candado"></span><span class="txt" data-t="bloquear"></span><small></small></button>
+        <button class="accion" id="suspender" data-confirma><span class="ico" data-ico="luna"></span><span class="txt" data-t="suspender"></span><small></small></button>
+      </div>
+    </section>
+
+    <section class="vista" id="vista-looks">
+      <h2 data-t="looks"></h2>
+      <div class="looks" id="looks"></div>
+    </section>
+
+    <section class="vista" id="vista-wallpapers">
+      <h2 data-t="wallpapers"></h2>
+      <div class="wallpapers" id="wallpapers"></div>
+    </section>
+  </main>
+
+  <nav>
+    <button data-vista="inicio" class="activa"><span class="ico" data-ico="casa"></span><span data-t="inicio"></span></button>
+    <button data-vista="looks"><span class="ico" data-ico="paleta"></span><span data-t="looks"></span></button>
+    <button data-vista="wallpapers"><span class="ico" data-ico="imagen"></span><span data-t="wallpapers"></span></button>
+  </nav>
+</div>
+
+<div class="aviso" id="aviso" role="status"></div>
+<script src="/app.js"></script>
+</body>
+</html>

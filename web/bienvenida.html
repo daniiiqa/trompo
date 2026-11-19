@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#16130f">
+<title>trompo</title>
+<link rel="icon" href="/icono.svg">
+<link rel="stylesheet" href="/bienvenida.css">
+</head>
+<body>
+<main>
+  <img class="trompo" src="/icono.svg" alt="">
+  <h1>trompo</h1>
+  <p class="sub" data-es="Tu compu desde el cel." data-en="Your computer from your phone."></p>
+
+  <section id="revisando">
+    <p data-es="Revisando la conexión segura…" data-en="Checking the secure connection…"></p>
+  </section>
+
+  <section id="pasos" hidden>
+    <p data-es="Una sola vez: instala el certificado de trompo para que el cel confíe en esta compu. Solo sirve para tu red de la casa: no puede hacerse pasar por ningún sitio de internet."
+       data-en="Just once: install trompo's certificate so the phone trusts this computer. It only works on your home network: it can't impersonate any website."></p>
+
+    <ol>
+      <li>
+        <a class="boton" href="/trompo-ca.crt" download="trompo-ca.crt" data-es="Bajar el certificado" data-en="Download the certificate"></a>
+      </li>
+      <li>
+        <span data-es="Ajustes → Seguridad y privacidad → Más ajustes de seguridad → Instalar desde almacenamiento → Certificado de CA → «trompo-ca.crt»."
+              data-en="Settings → Security and privacy → More security settings → Install from device storage → CA certificate → “trompo-ca.crt”."></span>
+        <small data-es="(En otros Android: busca «certificado de CA» en Ajustes.)" data-en="(Other Android phones: search Settings for “CA certificate”.)"></small>
+      </li>
+      <li>
+        <span data-es="Regresa aquí: sigue solo en cuanto lo detecte." data-en="Come back here: it continues on its own once it sees it."></span>
+      </li>
+    </ol>
+    <button class="boton secundario" id="otra" data-es="Ya lo instalé" data-en="I installed it"></button>
+  </section>
+</main>
+<script>
+  const es = (navigator.language || "").startsWith("es");
+  document.documentElement.lang = es ? "es" : "en";
+  for (const el of document.querySelectorAll("[data-es]")) el.textContent = es ? el.dataset.es : el.dataset.en;
+
+  const destino = `https://${location.hostname}:47421/${location.hash}`;
+  async function confia() {
+    try {
+      const r = await fetch(`https://${location.hostname}:47421/api/hola`, { cache: "no-store" });
+      return r.ok;
+    } catch { return false; }
+  }
+  async function revisa() {
+    if (await confia()) { location.replace(destino); return true; }
+    document.getElementById("revisando").hidden = true;
+    document.getElementById("pasos").hidden = false;
+    return false;
+  }
+  revisa();
+  document.getElementById("otra").onclick = revisa;
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) revisa(); });
+  setInterval(() => { if (!document.hidden) revisa(); }, 4000);
+</script>
+</body>
+</html>

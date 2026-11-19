@@ -1,0 +1,30 @@
+:root {
+  --bg: #16130f;
+  --fg: #efe6d4;
+  --muted: #a99e8a;
+  --acc: #d9572b;
+  --line: #3a332a;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--fg); }
+body {
+  font: 16px/1.5 ui-sans-serif, system-ui, sans-serif;
+  min-height: 100dvh;
+  padding: max(24px, env(safe-area-inset-top)) 16px max(24px, env(safe-area-inset-bottom));
+}
+main { max-width: 440px; margin: 0 auto; }
+.trompo { width: 88px; height: 88px; display: block; margin: 24px 0 8px; animation: gira 2.4s ease-in-out infinite; transform-origin: 50% 85%; }
+@keyframes gira { 0%, 100% { transform: rotate(-6deg); } 50% { transform: rotate(6deg); } }
+h1 { margin: 0; font-size: 34px; letter-spacing: -0.02em; }
+.sub { margin: 0 0 24px; color: var(--muted); }
+ol { padding-left: 22px; margin: 16px 0 24px; }
+li { margin: 0 0 18px; padding-left: 4px; }
+li::marker { color: var(--acc); font-weight: 700; }
+small { display: block; color: var(--muted); margin-top: 4px; }
+.boton {
+  display: inline-block; border: 0; border-radius: 12px; padding: 12px 18px;
+  background: var(--acc); color: #fff; font: inherit; font-weight: 600; text-decoration: none;
+}
+.boton.secundario { background: transparent; color: var(--fg); border: 1px solid var(--line); width: 100%; }
+@media (prefers-reduced-motion: reduce) { .trompo { animation: none; } }

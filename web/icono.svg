@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="112" fill="#16130f"/>
+  <!-- el trompo: perilla, cuerpo con sus franjas y la punta, girando -->
+  <g transform="rotate(-14 256 270)">
+    <rect x="236" y="92" width="40" height="66" rx="14" fill="#e8dcc4"/>
+    <path d="M128 196 Q256 136 384 196 Q392 250 256 420 Q120 250 128 196 Z" fill="#d9572b"/>
+    <path d="M140 232 Q256 196 372 232" stroke="#f2b33d" stroke-width="22" fill="none" stroke-linecap="round"/>
+    <path d="M168 282 Q256 256 344 282" stroke="#2f6fd0" stroke-width="20" fill="none" stroke-linecap="round"/>
+    <path d="M206 334 Q256 320 306 334" stroke="#e8dcc4" stroke-width="16" fill="none" stroke-linecap="round"/>
+    <path d="M256 420 L256 452" stroke="#e8dcc4" stroke-width="12" stroke-linecap="round"/>
+  </g>
+  <path d="M96 438 Q256 484 416 438" stroke="#e8dcc4" stroke-opacity=".35" stroke-width="10" fill="none" stroke-linecap="round"/>
+  <path d="M150 466 Q256 494 362 466" stroke="#e8dcc4" stroke-opacity=".18" stroke-width="8" fill="none" stroke-linecap="round"/>
+</svg>
